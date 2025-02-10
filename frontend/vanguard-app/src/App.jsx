@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+} from "react-router-dom";
+import React from "react";
+import LoginForm from "./pages/Auth/LoginForm";
+import SignUpForm from "./pages/Auth/SignUpForm";
+import Home from "./pages/Dashboard/Home";
+import CreatePoll from "./pages/Dashboard/CreatePoll";
+import MyPolls from "./pages/Dashboard/MyPolls";
+import VotedPolls from "./pages/Dashboard/VotedPolls";
+import Bookmarks from "./pages/Dashboard/Bookmarks";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Root />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/signUp" element={<SignUpForm />} />
+          <Route path="/dashboard" element={<Home />} />
+          <Route path="/create-poll" element={<CreatePoll />} />
+          <Route path="/my-polls" element={<MyPolls />} />
+          <Route path="/voted-polls" element={<VotedPolls />} />
+          <Route path="/bookmarked-polls" element={<Bookmarks />} />
+        </Routes>
+      </Router>
+    </div>
+  );
+};
 
-export default App
+export default App;
+
+
+//Define the root component to handle the initial redirect
+const Root = () => {
+  //Check if token exists in local storage
+  const isAuthenticated = !!localStorage.getItem("token");
+
+  //Redirect to dashboard if authenticated,othwerwise to login
+  return isAuthenticated ? (
+    <Navigate to="/dashboard" />
+  ) : (
+    <Navigate to="/login" />
+  );
+}
