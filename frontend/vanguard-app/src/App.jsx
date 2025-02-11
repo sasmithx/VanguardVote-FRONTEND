@@ -1,8 +1,4 @@
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import React from "react";
 import LoginForm from "./pages/Auth/LoginForm";
 import SignUpForm from "./pages/Auth/SignUpForm";
@@ -33,7 +29,6 @@ const App = () => {
 
 export default App;
 
-
 //Define the root component to handle the initial redirect
 const Root = () => {
   //Check if token exists in local storage
@@ -45,4 +40,4 @@ const Root = () => {
   ) : (
     <Navigate to="/login" />
   );
-}
+};
