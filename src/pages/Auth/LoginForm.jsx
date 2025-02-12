@@ -14,8 +14,8 @@ const LoginForm = () => {
 
   //Handle Login Form Submit
   const handleLogin = async (e) => {
-    e.preventDefault();    
-    
+    e.preventDefault();
+
     if (!validateEmail(email)) {
       setError("Please enter a valid email address.");
       return;
@@ -30,10 +30,7 @@ const LoginForm = () => {
 
     //Login API
     try {
-      
-    } catch (error) {
-      
-    }
+    } catch (error) {}
   };
 
   return (
