@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
 import React from "react";
 import LoginForm from "./pages/Auth/LoginForm";
 import SignUpForm from "./pages/Auth/SignUpForm";
@@ -7,10 +7,12 @@ import CreatePoll from "./pages/Dashboard/CreatePoll";
 import MyPolls from "./pages/Dashboard/MyPolls";
 import VotedPolls from "./pages/Dashboard/VotedPolls";
 import Bookmarks from "./pages/Dashboard/Bookmarks";
+import UserProvider from "./context/UserContext.jsx";
 
 const App = () => {
   return (
     <div>
+      <UserProvider>
       <Router>
         <Routes>
           <Route path="/" element={<Root />} />
@@ -23,6 +25,7 @@ const App = () => {
           <Route path="/bookmarked-polls" element={<Bookmarks />} />
         </Routes>
       </Router>
+      </UserProvider>
     </div>
   );
 };
