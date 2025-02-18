@@ -23,4 +23,12 @@
     .btn-primary {
         @apply w-full text-sm font-medium text-white bg-primary shadow-lg shadow-primary/5 p-[10px] rounded-md my-1 hover:bg-primary/15 hover:text-primary;
     }
+
+    .option-chip {
+        @apply text-xs font-medium text-sky-700 bg-sky-100 px-4 py-1 rounded-lg border border-sky-50 cursor-pointer hover:border-primary
+    }
+
+    .btn-small{
+        @apply flex items-center gap-1 text-xs font-medium bg-primary text-white hover:bg-sky-200/60 hover:text-primary rounded px-3 py-[4px]
+    }
 }
