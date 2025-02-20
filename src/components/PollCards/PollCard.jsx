@@ -1,8 +1,12 @@
-import React, {useContext, useState} from "react";
+import React, {useCallback, useContext, useState} from "react";
 import {UserContext} from "../../context/UserContext.jsx";
 import {getPollBookmarked} from "../../utils/helper.js";
 import UserProfileInfo from "../cards/UserProfileInfo.jsx";
 import PollActions from "./PollActions.jsx";
+import PollContent from "./PollContent.jsx";
+import axiosinstance from "../../utils/axiosinstance.js";
+import {API_PATHS} from "../../utils/apiPath.js";
+import toast from "react-hot-toast";
 
 const PollCard = ({
                       pollId,
@@ -43,6 +47,38 @@ const PollCard = ({
     const [pollClosed, setPollClosed] = useState(isPollClosed || false);
     const [pollDeleted, setPollDeleted] = useState(false);
 
+    // Handles user input based on the poll type
+    const handleInput = (value) => {
+        if (type === "rating") setRating(value);
+        else if (type === "open-ended") setUserResponse(value);
+        else setSelectedOptionIndex(value);
+    };
+
+    // Generates post data based on the poll type
+    const getPostData =  useCallback(() => {
+        if (type === "open-ended") {
+            return {responseText: userResponse, voterId: user._id};
+        }
+        if (type === "rating") {
+            return {optionIndex: rating - 1, voterId: user._id};
+        }, [type, userResponse, rating, selectedOptionIndex, user]);
+
+    // Handles the submission of the user's vote
+    const handleVoteSubmit = async () => {
+        try {
+            const response = await axiosinstance.post(
+                API_PATHS.POLLS.VOTE(pollId),
+                getPostData()
+            );
+
+            getPollDetail()
+            setIsVoteComplete(true);
+            toast.success("Vote Submitted Successfully");
+        } catch (error) {
+            console.error(error.response?.data?.message || error.message);
+        }
+    }
+
     return !pollDeleted && <div className="bg-slate-100/50 my-5 p-5 rounded-lg border border-slate-100 mx-auto">
         <div className="flex items-start justify-between">
             <UserProfileInfo
@@ -56,17 +92,37 @@ const PollCard = ({
                 pollId={pollId}
                 isVoteComplete={isVoteComplete}
                 inputCaptured={
-                    !!(userResponse || selectedOptionIndex >=0 || rating > 0)
+                    !!(userResponse || selectedOptionIndex >= 0 || rating > 0)
                 }
-                onVoteSubmit={()=>{}}
+                onVoteSubmit={handleVoteSubmit}
                 isBookmarked={pollBookmarked}
-                toggleBookmark={()=>{}}
+                toggleBookmark={() => {
+                }}
                 isMyPoll={isMyPoll}
                 pollClosed={pollClosed}
-                onClosePoll={()=>{}}
-                onDelete={()=>{}}
+                onClosePoll={() => {
+                }}
+                onDelete={() => {
+                }}
             />
         </div>
+
+        <div className="ml-14 mt-3">
+            <p className="text-[15px] text-black leading-8">{question}</p>
+            <div className="mt-4">
+                <PollContent
+                    type={type}
+                    options={options}
+                    selectedOptionIndex={selectedOptionIndex}
+                    onOptionSelect={handleInput}
+                    rating={rating}
+                    onRatingChange={handleInput}
+                    userResponse={userResponse}
+                    onResponseChange={handleInput}
+                />
+            </div>
+        </div>
+
     </div>;
 };
 
