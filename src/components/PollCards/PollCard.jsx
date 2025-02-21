@@ -24,7 +24,7 @@ const PollCard = ({
                       createdAt,
                   }) => {
 
-    const {user} = useContext(UserContext);
+    const {user, onUserVoted} = useContext(UserContext);
 
     const [selectedOptionIndex, setSelectedOptionIndex] = useState(-1);
     const [rating, setRating] = useState(0);
@@ -55,13 +55,34 @@ const PollCard = ({
     };
 
     // Generates post data based on the poll type
-    const getPostData =  useCallback(() => {
+    const getPostData = useCallback(() => {
         if (type === "open-ended") {
             return {responseText: userResponse, voterId: user._id};
         }
         if (type === "rating") {
             return {optionIndex: rating - 1, voterId: user._id};
-        }, [type, userResponse, rating, selectedOptionIndex, user]);
+        }
+        return {optionIndex: selectedOptionIndex, voterId: user._id};
+    }, [type, userResponse, rating, selectedOptionIndex, user]);
+
+    // Get Poll Details By ID
+    const getPollDetail = async () => {
+        try {
+            const response = await axiosinstance.get(
+                API_PATHS.POLLS.GET_BY_ID(pollId)
+            );
+            if (response.data) {
+                const pollDetails = response.data;
+                setPollResult({
+                    options: pollDetails.options || [],
+                    voters: pollDetails.voters.length || 0,
+                    responses: pollDetails.responses || [],
+                });
+            }
+        } catch (error) {
+            console.error(error.response?.data?.message || error.message);
+        }
+    };
 
     // Handles the submission of the user's vote
     const handleVoteSubmit = async () => {
@@ -73,6 +94,7 @@ const PollCard = ({
 
             getPollDetail()
             setIsVoteComplete(true);
+            onUserVoted();
             toast.success("Vote Submitted Successfully");
         } catch (error) {
             console.error(error.response?.data?.message || error.message);
@@ -110,16 +132,20 @@ const PollCard = ({
         <div className="ml-14 mt-3">
             <p className="text-[15px] text-black leading-8">{question}</p>
             <div className="mt-4">
-                <PollContent
-                    type={type}
-                    options={options}
-                    selectedOptionIndex={selectedOptionIndex}
-                    onOptionSelect={handleInput}
-                    rating={rating}
-                    onRatingChange={handleInput}
-                    userResponse={userResponse}
-                    onResponseChange={handleInput}
-                />
+                {isVoteComplete || isPollClosed ? (
+                    <>Show Result</>
+                ) : (
+                    <PollContent
+                        type={type}
+                        options={options}
+                        selectedOptionIndex={selectedOptionIndex}
+                        onOptionSelect={handleInput}
+                        rating={rating}
+                        onRatingChange={handleInput}
+                        userResponse={userResponse}
+                        onResponseChange={handleInput}
+                    />
+                )}
             </div>
         </div>
 
