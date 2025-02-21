@@ -38,13 +38,37 @@ const UserProvider = ({children}) => {
         );
     };
 
+    //Add or remove poll id from bookmarkedPolls
+    const toggleBookmarkId = (id) => {
+        const bookmarks = user.bookmarkedPolls || [];
+
+        const index = bookmarks.indexOf(id);
+
+        if (index === -1) {
+            // Add the ID if it's not in the array
+            setUser((prev) => ({
+                ...prev,
+                bookmarkedPolls: [...bookmarks, id],
+                totalPollsBookmarked: prev.totalPollsBookmarked + 1,
+            }));
+        } else {
+            // Remove the ID if it's in the array
+            setUser((prev) => ({
+                ...prev,
+                bookmarkedPolls: bookmarks.filter((item) => item !== id),
+                totalPollsBookmarked: prev.totalPollsBookmarked - 1,
+            }));
+        }
+    };
+
     return <UserContext.Provider
         value={{
             user,
             updateUser,
             clearUser,
             onPollCreateOrDelete,
-            onUserVoted
+            onUserVoted,
+            toggleBookmarkId
         }}
     >{children}</UserContext.Provider>
 };

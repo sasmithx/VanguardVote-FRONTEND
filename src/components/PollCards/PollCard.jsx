@@ -7,6 +7,7 @@ import PollContent from "./PollContent.jsx";
 import axiosinstance from "../../utils/axiosinstance.js";
 import {API_PATHS} from "../../utils/apiPath.js";
 import toast from "react-hot-toast";
+import PollingResultContent from "./PollingResultContent.jsx";
 
 const PollCard = ({
                       pollId,
@@ -24,7 +25,7 @@ const PollCard = ({
                       createdAt,
                   }) => {
 
-    const {user, onUserVoted} = useContext(UserContext);
+    const {user, onUserVoted, toggleBookmarkId} = useContext(UserContext);
 
     const [selectedOptionIndex, setSelectedOptionIndex] = useState(-1);
     const [rating, setRating] = useState(0);
@@ -101,6 +102,24 @@ const PollCard = ({
         }
     }
 
+    // Toggles the bookmark status of the poll
+    const toggleBookmark = async () => {
+        try {
+            const response = await axiosinstance.post(
+                API_PATHS.POLLS.BOOKMARK(pollId)
+            );
+
+            toggleBookmarkId(pollId);
+            setPollBookmarked((prev) => !prev);
+            toast.success(
+                pollBookmarked ? "Poll Removed from Bookmarks" : "Poll Bookmarked"
+            );
+        } catch (error) {
+            console.error(error.response?.data?.message || error.message);
+        }
+    };
+
+
     return !pollDeleted && <div className="bg-slate-100/50 my-5 p-5 rounded-lg border border-slate-100 mx-auto">
         <div className="flex items-start justify-between">
             <UserProfileInfo
@@ -118,12 +137,10 @@ const PollCard = ({
                 }
                 onVoteSubmit={handleVoteSubmit}
                 isBookmarked={pollBookmarked}
-                toggleBookmark={() => {
-                }}
+                toggleBookmark={toggleBookmark}
                 isMyPoll={isMyPoll}
                 pollClosed={pollClosed}
-                onClosePoll={() => {
-                }}
+                onClosePoll={() => {}}
                 onDelete={() => {
                 }}
             />
@@ -133,7 +150,12 @@ const PollCard = ({
             <p className="text-[15px] text-black leading-8">{question}</p>
             <div className="mt-4">
                 {isVoteComplete || isPollClosed ? (
-                    <>Show Result</>
+                    <PollingResultContent
+                        type={type}
+                        options={pollResult.options || []}
+                        voters={pollResult.voters}
+                        responses={pollResult.responses || []}
+                    />
                 ) : (
                     <PollContent
                         type={type}
