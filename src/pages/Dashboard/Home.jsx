@@ -7,6 +7,8 @@ import axiosinstance from "../../utils/axiosinstance.js";
 import { API_PATHS } from "../../utils/apiPath.js";
 import PollCard from "../../components/PollCards/PollCard.jsx";
 import InfiniteScroll from "react-infinite-scroll-component";
+import EmptyCard from "../../components/cards/EmptyCard.jsx";
+import CREATE_ICON from "../../assets/images/my-poll-icon.png";
 
 const PAGE_SIZE = 5;
 
@@ -80,6 +82,15 @@ const Home = () => {
                     filterType={filterType}
                     setFilterType={setFilterType}
                 />
+
+                {allPolls.length === 0 && !loading && (
+                    <EmptyCard
+                        imgSrc={CREATE_ICON}
+                        message="Welcome! Create your first poll now."
+                        btnText="Create Poll"
+                        onClick={() => navigate("/create-poll")}
+                    />
+                )}
 
                 <InfiniteScroll
                     dataLength={allPolls.length}
